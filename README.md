@@ -21,3 +21,14 @@ La aplicación permite ampliar la muestra de usuarios para futuros análisis sob
 - Base de datos: MongoDB
 - Integración IA: OpenAI API
 
+PARA ARRANCAR EN LOCAL
+**BACKEND**
+Desde IAcierta: 
+    - **mvn clean install** para instalar dependencias
+    - **mvn spring-boot:run** para arrancar
+
+**FRONTEND**
+Desde IAcierta/frontend:
+    - **npm install** para instalar dependencias
+    - **ng build** para construir
+    - **ng serve** para arrancar

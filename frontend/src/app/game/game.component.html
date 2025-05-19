@@ -1,0 +1,24 @@
+<div class="game-container">
+  <!-- Botón para volver a la página de inicio -->
+  <button class="home-btn" (click)="goHome()">Inicio</button>
+
+  <!-- Contenedor Rosco -->
+  <div class="rosco">
+    <!-- Letras dispuestas alrededor del círculo -->
+    <div *ngFor="let letter of letters" class="letter" [style.transform]="letter.style">
+      {{ letter.value }}
+    </div>
+
+    <!-- Panel central -->
+    <div class="inner-panel">
+      <div *ngIf="question; else loading">
+        <h2>{{ question.pregunta }}</h2>
+        <input type="text" [(ngModel)]="userAnswer" placeholder="Escribe tu respuesta" />
+        <button (click)="submitAnswer()">Enviar</button>
+      </div>
+      <ng-template #loading>
+        <p>Cargando pregunta...</p>
+      </ng-template>
+    </div>
+  </div>
+</div>
