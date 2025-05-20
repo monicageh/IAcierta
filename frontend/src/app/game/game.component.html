@@ -1,21 +1,37 @@
-<div class="game-container">
-  <!-- Bot�n para volver a la p�gina de inicio -->
-  <button class="home-btn" (click)="goHome()">Inicio</button>
-
-  <!-- Contenedor Rosco -->
+<!-- frontend/src/app/game/game.component.html -->
+<!-- Añadimos un wrapper que ocupa toda la ventana -->
+<div class="game-wrapper">
   <div class="rosco">
-    <!-- Letras dispuestas alrededor del c�rculo -->
-    <div *ngFor="let letter of letters" class="letter" [style.transform]="letter.style">
-      {{ letter.value }}
-    </div>
-
-    <!-- Panel central -->
+    <!-- Panel interior de pregunta/respuesta -->
     <div class="inner-panel">
-      <div *ngIf="question; else loading">
-        <h2>{{ question.pregunta }}</h2>
-        <input type="text" [(ngModel)]="userAnswer" placeholder="Escribe tu respuesta" />
-        <button (click)="submitAnswer()">Enviar</button>
+      <!-- Números del rosco -->
+      <div *ngFor="let letter of letters"
+          class="letter"
+          [style.transform]="letter.style">
+        {{ letter.value }}
       </div>
+      <ng-container *ngIf="question; else loading">
+        <h2>{{ question.pregunta }}</h2>
+        <input type="text"
+               [(ngModel)]="userAnswer"
+               placeholder="Tu respuesta" />
+        <button *ngIf="!showFeedback"
+                (click)="submitAnswer()">
+          Enviar
+        </button>
+
+        <div *ngIf="showFeedback"
+             class="feedback"
+             [class.correct]="isCorrect"
+             [class.incorrect]="!isCorrect">
+          <p>✔️ Correcta: {{ question.respuestaCorrecta }}</p>
+          <p>🧑 Tú: {{ userAnswer }}</p>
+          <p>🤖 GPT: {{ question.respuestaChatgpt }}</p>
+          <button (click)="nextQuestion()">
+            Siguiente pregunta
+          </button>
+        </div>
+      </ng-container>
       <ng-template #loading>
         <p>Cargando pregunta...</p>
       </ng-template>
