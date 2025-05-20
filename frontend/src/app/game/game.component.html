@@ -1,61 +1,83 @@
-<!-- frontend/src/app/game/game.component.html -->
+<!-- src/app/game/game.component.html -->
 
 <div class="game-wrapper">
+
+  <!-- 1) Logo en esquina superior izquierda -->
+  <img src="assets/logoIAcierta.png"
+       alt="IAcierta"
+       class="logo" />
+
+  <!-- 2) Rosco con posiciones absolutas -->
   <div #roscoRef class="rosco">
 
-    <!-- circulitos con números -->
-    <div *ngFor="let letter of letters"
+    <!-- 2a) Botón Salir -->
+    <button class="exit-button" (click)="exitGame()">✖</button>
+
+    <!-- 2b) Círculos numéricos -->
+    <div *ngFor="let l of letters"
          class="letter"
-         [style.width.px]="letter.size"
-         [style.height.px]="letter.size"
-         [style.left.px]="letter.x"
-         [style.top.px]="letter.y"
-         [style.fontSize.px]="letter.size * 0.5">
-      {{ letter.value }}
+         [ngClass]="{
+           'active': l.index === currentIndex,
+           'correct': answerStatus[l.index] === 'correct',
+           'incorrect': answerStatus[l.index] === 'incorrect'
+         }"
+         [style.width.px]="l.size"
+         [style.height.px]="l.size"
+         [style.left.px]="l.x"
+         [style.top.px]="l.y"
+         [style.fontSize.px]="l.size * 0.6">
+      {{ l.value }}
     </div>
 
-    <!-- PANEL CENTRAL -->
-    <div class="inner-panel">
+    <!-- 3) Panel central -->
+  <div class="inner-panel">
+    <ng-container *ngIf="question; else loading">
 
-      <!-- 1. Mostrar pregunta -->
-      <div class="question-text" *ngIf="question; else loading">
-        {{ question.pregunta }}
+      <!-- Indicador “Empieza por la X:” -->
+      <div class="start-line">
+        <span class="start-phrase">Empieza por la</span>
+        <span class="start-letter">{{ question.respuestaCorrecta.charAt(0) }}</span>
+        <span class="start-phrase">:</span>
       </div>
 
-      <!-- 2. Input de respuesta -->
-      <input
-        class="answer-input"
-        type="text"
-        [(ngModel)]="userAnswer"
-        placeholder="Escribe tu respuesta…" />
+      <!-- Nuevo recuadro para el cuerpo de la pregunta -->
+      <div class="question-body-box">
+        {{ questionBody }}
+      </div>
 
-      <!-- 3. Botón Comprobar -->
-      <button class="check-button" (click)="checkAnswer()">
+      <!-- Input y botón -->
+      <input class="answer-input"
+            type="text"
+            [(ngModel)]="userAnswer"
+            placeholder="Tu respuesta…" />
+
+      <button class="check-button"
+              *ngIf="!showFeedback"
+              (click)="checkAnswer()">
         Comprobar
       </button>
 
-      <!-- 4. Feedback -->
+      <!-- Feedback -->
       <div *ngIf="showFeedback"
-           class="feedback"
-           [class.correct]="isCorrect"
-           [class.incorrect]="!isCorrect">
-        <span *ngIf="isCorrect">
-          ✔️ ¡Correcto!
-        </span>
+          class="feedback"
+          [class.correct]="isCorrect"
+          [class.incorrect]="!isCorrect">
+        <span *ngIf="isCorrect">✔️ ¡Correcto!</span>
         <span *ngIf="!isCorrect">
-          ❌ Incorrecto. La respuesta correcta es
-          <strong>{{ question?.respuestaCorrecta }}</strong>
+          ❌ La respuesta es:
+          <strong>{{ feedback?.correctAnswer }}</strong>
         </span>
         <button class="next-button" (click)="nextQuestion()">
           Siguiente pregunta
         </button>
       </div>
 
-      <!-- Loading state -->
-      <ng-template #loading>
-        <p>Cargando pregunta…</p>
-      </ng-template>
-    </div>
-    
+    </ng-container>
+
+    <ng-template #loading>
+      <p>Cargando preguntas…</p>
+    </ng-template>
+  </div>
+
   </div>
 </div>

@@ -1,11 +1,14 @@
+// src/main/java/etsit/tfg/roscos/service/QuestionService.java
 package etsit.tfg.roscos.service;
 
+import etsit.tfg.roscos.dto.AnswerResultDto;
 import etsit.tfg.roscos.model.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class QuestionService {
@@ -14,13 +17,37 @@ public class QuestionService {
     private MongoTemplate mongoTemplate;
 
     /**
-     * Obtiene una pregunta aleatoria de la colección especificada.
-     * @param collectionName El nombre de la colección ("rae" o "ingles").
-     * @return Una pregunta aleatoria con los campos: pregunta, respuesta_correcta y respuesta_chatgpt.
+     * Devuelve 25 preguntas aleatorias de la colección
+     * questions_es o questions_en según lang.
      */
-    public Question getRandomQuestion(String collectionName) {
-        Aggregation aggregation = Aggregation.newAggregation(Aggregation.sample(1));
-        AggregationResults<Question> result = mongoTemplate.aggregate(aggregation, collectionName, Question.class);
-        return result.getUniqueMappedResult();
+    public List<Question> getRandomQuestions(String lang) {
+        String collection = "questions_" + lang;               // p.ej. "questions_es"
+        Aggregation agg = Aggregation.newAggregation(Aggregation.sample(25));
+        return mongoTemplate
+                .aggregate(agg, collection, Question.class)
+                .getMappedResults();
+    }
+
+    /**
+     * Busca una pregunta por su ID en la colección de lang.
+     */
+    public Question getQuestionById(String id, String lang) {
+        String collection = "questions_" + lang;
+        return mongoTemplate.findById(id, Question.class, collection);
+    }
+
+    /**
+     * Comprueba si la respuesta del jugador coincide con respuestaCorrecta.
+     */
+    public AnswerResultDto checkAnswer(String questionId, String lang, String playerAnswer) {
+        Question q = getQuestionById(questionId, lang);
+        boolean ok = q.getRespuestaCorrecta()
+                      .equalsIgnoreCase(playerAnswer.trim());
+        return new AnswerResultDto(
+            ok,
+            q.getRespuestaCorrecta(),
+            playerAnswer,
+            q.getRespuestaChatgpt()
+        );
     }
 }

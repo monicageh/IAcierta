@@ -9,11 +9,13 @@ import { GameService } from '../services/game.service';
 })
 export class HomeComponent {
 
-  constructor(private gameService: GameService, private router: Router) { }
+  constructor(
+    private gameService: GameService,
+    private router: Router
+  ) { }
 
-  selectLanguage(lang: string) {
-    // "rae" para español, "ingles" para inglés.
-    this.gameService.setSelectedCollection(lang);
+  selectLanguage(lang: 'es' | 'en') {
+    this.gameService.setSelectedLang(lang);
     this.router.navigate(['/game']);
   }
 }

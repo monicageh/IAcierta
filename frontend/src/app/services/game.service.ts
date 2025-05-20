@@ -4,13 +4,17 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class GameService {
-  private selectedCollection: string = 'rae';
+  private selectedLang: 'es' | 'en' | '' = '';
 
-  setSelectedCollection(collection: string) {
-    this.selectedCollection = collection;
+  setSelectedLang(lang: 'es' | 'en') {
+    this.selectedLang = lang;
   }
 
-  getSelectedCollection(): string {
-    return this.selectedCollection;
+  getSelectedLang(): 'es' | 'en' | '' {
+    return this.selectedLang;
+  }
+
+  clear() {
+    this.selectedLang = '';
   }
 }

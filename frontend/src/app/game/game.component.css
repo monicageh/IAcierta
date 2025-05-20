@@ -1,110 +1,206 @@
-/* frontend/src/app/game/game.component.css */
+/* src/app/game/game.component.css */
 
-/* Wrapper fullscreen y centrado */
+/* 0) Evitar scroll y ocupar toda la pantalla */
+html, body {
+  margin: 0; padding: 0;
+  width: 100%; height: 100%; overflow: hidden;
+}
+
+/* 1) Fondo y tipografía general */
 .game-wrapper {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
-  margin: 0; padding: 0;
-  box-sizing: border-box;
+  width: 100vw;  height: 100vh;
+  background-color: #0d1b2a;
+  font-family: sans-serif;
 }
 
-/* Rosco responsivo */
+/* 2) Logo en top-left */
+.logo {
+  position: absolute;
+  top: 12px; left: 12px;
+  width: 100px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 3) Rosco responsivo */
 .rosco {
   position: relative;
   width: 90vmin;
   height: 90vmin;
-  max-width: 100%;
-  max-height: 100%;
 }
 
-/* Numeritos en su círculo */
+/* 4) Botón Salir dentro del rosco */
+/* Botón “X” grande y roja */
+.exit-button {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 3rem;        /* más grande */
+  line-height: 1;
+  background: none;         /* sin fondo */
+  color: #e53935;           /* rojo intenso */
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;       /* circunferencia */
+  transition: background 0.2s;
+}
+
+.exit-button:hover {
+  background: rgba(229,57,53,0.1);
+}
+
+
+/* 5) Cada número dentro de su círculo */
 .letter {
   position: absolute;
-  border: 2px solid #333;
+  border: 2px solid #0099e5;
+  background: rgba(0,153,229,0.1);
   border-radius: 50%;
-  background: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #0099e5;
   font-weight: bold;
+  transition: all 0.2s;
 }
 
-/* PANEL CENTRAL */
+/* 5a) Resaltado del actual */
+.letter.active {
+  background: #0099e5;
+  color: #0d1b2a;
+}
+
+/* 5b) Marcado de respondidas */
+.letter.correct {
+  background: rgba(46,204,113,0.5);
+  border-color: #2ecc71;
+  color: #0d1b2a;
+}
+.letter.incorrect {
+  background: rgba(229,57,53,0.5);
+  border-color: #e53935;
+  color: #0d1b2a;
+}
+
+/* 6) Panel central en cuadrado azul con texto oscuro */
 .inner-panel {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: 45%;           /* ajusta según gusto */
-  max-width: 360px;
-  background: rgba(255,255,255,0.95);
-  padding: 1rem;
+  width: 45%; max-width: 360px;
+  background: #0099e5;
+  color: #0d1b2a;
+  padding: 1.2rem;
   border-radius: 8px;
-
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   gap: 1rem;
-}
-
-/* Pregunta: tipografía y centrado */
-.question-text {
-  font-size: 1.2rem;
-  line-height: 1.4;
   text-align: center;
-  word-wrap: break-word;
 }
 
-/* Input de respuesta */
+/* 7) Pregunta */
+.question-text {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+/* ---------------------------------- */
+/* Línea “Empieza por la X:” */
+/* ------------------------------------------------------- */
+/*  Start-line como flex alineado por la línea base inferior */
+.start-line {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;   /* alinea fondo de texto y círculo */
+  gap: 0.5rem;             /* espacio entre frase y círculo */
+  margin-bottom: 0.5rem;
+}
+
+/* Frase “Empieza por la” */
+.start-phrase {
+  font-weight: bold;
+  font-size: 1.3rem;       /* ligeramente más grande */
+  line-height: 1;          /* para que su baseline baje */
+  color: #0d1b2a;
+}
+
+/* La letra dentro de círculo */
+.start-letter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  background-color: #0d1b2a;
+  border-radius: 50%;
+  font-weight: 900;        /* Black */
+  font-size: 2.8rem;       /* un poco más grande aún */
+  color: #2ecc71;
+}
+
+/* ------------------------------------------------------- */
+/* Texto de la pregunta */
+.question-text {
+  font-size: 1.15rem;      /* de 1rem a 1.15rem */
+  font-weight: 600;        /* semi-bold */
+  line-height: 1.5;
+  color: #0d1b2a;
+  margin-bottom: 1rem;
+}
+
+/* ------------------------------------------------------- */
+/* Recuadro del cuerpo de la pregunta */
+.question-body-box {
+  background-color: #33baf0;  /* tono más claro de azul IAcierta */
+  color: #0d1b2a;             /* texto oscuro */
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* 8) Input dentro del panel */
 .answer-input {
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-}
-
-/* Botón Comprobar */
-.check-button {
   padding: 0.6rem;
   font-size: 1rem;
-  cursor: pointer;
-  border: none;
-  background: #1976d2;
-  color: #fff;
+  border: 2px solid #0d1b2a;
   border-radius: 4px;
+  background: #fff;
+  color: #0d1b2a;
+}
+.answer-input::placeholder {
+  color: #666;
 }
 
-/* Feedback */
-.feedback {
-  padding: 0.75rem;
-  border-radius: 6px;
-  text-align: center;
-}
-.feedback.correct {
-  background-color: #a5d6a7;
-  color: #000;
-}
-.feedback.incorrect {
-  background-color: #ef9a9a;
-  color: #000;
-}
-
-/* Botón Siguiente dentro del feedback */
+/* 9) Botones dentro del panel */
+.check-button,
 .next-button {
-  margin-top: 0.75rem;
-  padding: 0.5rem;
+  padding: 0.7rem;
   font-size: 1rem;
-  cursor: pointer;
   border: none;
-  background: #388e3c;
-  color: #fff;
   border-radius: 4px;
+  cursor: pointer;
+}
+.check-button {
+  background: #0d1b2a;
+  color: #fff;
+}
+.next-button {
+  background: #2ecc71;
+  color: #0d1b2a;
 }
 
-/* Loading centrado */
-.inner-panel p {
-  text-align: center;
-  margin: 0;
+/* 10) Feedback texto */
+.feedback {
+  font-size: 1rem;
 }

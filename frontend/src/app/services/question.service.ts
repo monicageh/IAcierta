@@ -9,6 +9,13 @@ export interface Question {
   respuestaChatgpt: string;
 }
 
+export interface AnswerResult {
+  correct: boolean;
+  correctAnswer: string;
+  playerAnswer: string;
+  chatgptAnswer: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,7 +24,20 @@ export class QuestionService {
 
   constructor(private http: HttpClient) {}
 
-  getRandomQuestion(collection: string): Observable<Question> {
-    return this.http.get<Question>(`${this.baseUrl}/random/${collection}`);
+  /** 1) Arranca partida */
+  startGame(lang: 'es' | 'en'): Observable<Question[]> {
+    return this.http.get<Question[]>(`${this.baseUrl}/start/${lang}`);
+  }
+
+  /** 2) Comprueba una respuesta */
+  checkAnswer(
+    questionId: string,
+    lang: 'es' | 'en',
+    answer: string
+  ): Observable<AnswerResult> {
+    return this.http.post<AnswerResult>(
+      `${this.baseUrl}/check`,
+      { questionId, lang, answer }
+    );
   }
 }
