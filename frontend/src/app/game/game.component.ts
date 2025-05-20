@@ -1,19 +1,29 @@
 // frontend/src/app/game/game.component.ts
-import { Component, OnInit } from '@angular/core';
+
+import { Component, OnInit, AfterViewInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameService } from '../services/game.service';
 import { QuestionService, Question } from '../services/question.service';
+
+interface Letter {
+  value: string;
+  x: number;
+  y: number;
+  size: number;
+}
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css']
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, AfterViewInit {
+  @ViewChild('roscoRef') roscoRef!: ElementRef<HTMLDivElement>;
+
   question: Question | null = null;
-  userAnswer: string = '';
-  selectedCollection: string = '';
-  letters: { value: string; style: string }[] = [];
+  userAnswer = '';
+  selectedCollection = '';
+  letters: Letter[] = [];
   showFeedback = false;
   isCorrect = false;
 
@@ -26,18 +36,27 @@ export class GameComponent implements OnInit {
   ngOnInit(): void {
     this.selectedCollection = this.gameService.getSelectedCollection();
     this.loadRandomQuestion();
+  }
+
+  ngAfterViewInit(): void {
+    this.generateRoscoLetters();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
     this.generateRoscoLetters();
   }
 
   loadRandomQuestion(): void {
     this.questionService.getRandomQuestion(this.selectedCollection)
       .subscribe({
-        next: (data: Question) => this.question = data,
-        error: (err) => console.error('Error al obtener la pregunta', err)
+        next: q => this.question = q,
+        error: e => console.error('Error al obtener pregunta', e)
       });
   }
 
-  submitAnswer(): void {
+  /** Se llama al apretar “Comprobar” */
+  checkAnswer(): void {
     if (!this.question) return;
     this.isCorrect = this.userAnswer.trim().toLowerCase()
       === this.question.respuestaCorrecta.trim().toLowerCase();
@@ -54,19 +73,22 @@ export class GameComponent implements OnInit {
     this.router.navigate(['']);
   }
 
-  generateRoscoLetters(): void {
+  private generateRoscoLetters(): void {
+    if (!this.roscoRef) return;
+    const rect = this.roscoRef.nativeElement.getBoundingClientRect();
+    const outer = Math.min(rect.width, rect.height);
+    const center = outer / 2;
+    const circleSize = outer * 0.1;
+    const radius = center - circleSize / 2;
     const total = 25;
-    const radius = 150;
+
     this.letters = [];
     for (let i = 0; i < total; i++) {
-      const angle = (360 / total) * i - 90;  // arrancamos arriba y avanzamos CW
+      const angle = (360 / total) * i - 90;
       const rad = angle * Math.PI / 180;
-      const x = radius * Math.cos(rad);
-      const y = radius * Math.sin(rad);
-      this.letters.push({
-        value: (i + 1).toString(),
-        style: `translate(${x}px, ${y}px)`
-      });
+      const x = center + radius * Math.cos(rad) - circleSize / 2;
+      const y = center + radius * Math.sin(rad) - circleSize / 2;
+      this.letters.push({ value: (i + 1).toString(), x, y, size: circleSize });
     }
   }
 }

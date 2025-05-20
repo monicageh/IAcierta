@@ -1,40 +1,61 @@
 <!-- frontend/src/app/game/game.component.html -->
-<!-- Añadimos un wrapper que ocupa toda la ventana -->
-<div class="game-wrapper">
-  <div class="rosco">
-    <!-- Panel interior de pregunta/respuesta -->
-    <div class="inner-panel">
-      <!-- Números del rosco -->
-      <div *ngFor="let letter of letters"
-          class="letter"
-          [style.transform]="letter.style">
-        {{ letter.value }}
-      </div>
-      <ng-container *ngIf="question; else loading">
-        <h2>{{ question.pregunta }}</h2>
-        <input type="text"
-               [(ngModel)]="userAnswer"
-               placeholder="Tu respuesta" />
-        <button *ngIf="!showFeedback"
-                (click)="submitAnswer()">
-          Enviar
-        </button>
 
-        <div *ngIf="showFeedback"
-             class="feedback"
-             [class.correct]="isCorrect"
-             [class.incorrect]="!isCorrect">
-          <p>✔️ Correcta: {{ question.respuestaCorrecta }}</p>
-          <p>🧑 Tú: {{ userAnswer }}</p>
-          <p>🤖 GPT: {{ question.respuestaChatgpt }}</p>
-          <button (click)="nextQuestion()">
-            Siguiente pregunta
-          </button>
-        </div>
-      </ng-container>
+<div class="game-wrapper">
+  <div #roscoRef class="rosco">
+
+    <!-- circulitos con números -->
+    <div *ngFor="let letter of letters"
+         class="letter"
+         [style.width.px]="letter.size"
+         [style.height.px]="letter.size"
+         [style.left.px]="letter.x"
+         [style.top.px]="letter.y"
+         [style.fontSize.px]="letter.size * 0.5">
+      {{ letter.value }}
+    </div>
+
+    <!-- PANEL CENTRAL -->
+    <div class="inner-panel">
+
+      <!-- 1. Mostrar pregunta -->
+      <div class="question-text" *ngIf="question; else loading">
+        {{ question.pregunta }}
+      </div>
+
+      <!-- 2. Input de respuesta -->
+      <input
+        class="answer-input"
+        type="text"
+        [(ngModel)]="userAnswer"
+        placeholder="Escribe tu respuesta…" />
+
+      <!-- 3. Botón Comprobar -->
+      <button class="check-button" (click)="checkAnswer()">
+        Comprobar
+      </button>
+
+      <!-- 4. Feedback -->
+      <div *ngIf="showFeedback"
+           class="feedback"
+           [class.correct]="isCorrect"
+           [class.incorrect]="!isCorrect">
+        <span *ngIf="isCorrect">
+          ✔️ ¡Correcto!
+        </span>
+        <span *ngIf="!isCorrect">
+          ❌ Incorrecto. La respuesta correcta es
+          <strong>{{ question?.respuestaCorrecta }}</strong>
+        </span>
+        <button class="next-button" (click)="nextQuestion()">
+          Siguiente pregunta
+        </button>
+      </div>
+
+      <!-- Loading state -->
       <ng-template #loading>
-        <p>Cargando pregunta...</p>
+        <p>Cargando pregunta…</p>
       </ng-template>
     </div>
+    
   </div>
 </div>
