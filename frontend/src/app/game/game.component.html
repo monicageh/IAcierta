@@ -13,7 +13,19 @@
     <!-- 2a) Botón Salir -->
     <button class="exit-button" (click)="exitGame()">✖</button>
 
-    <!-- 2b) Círculos numéricos -->
+    <!-- 2b) Marcadores dentro del rosco -->
+    <div class="scoreboard">
+      <div class="score-item player">
+        <span class="label">Jugador</span>
+        <span class="value">{{ playerScore }}</span>
+      </div>
+      <div class="score-item chatgpt">
+        <span class="label">ChatGPT</span>
+        <span class="value">{{ chatgptScore }}</span>
+      </div>
+    </div>
+
+    <!-- 2c) Círculos numéricos -->
     <div *ngFor="let l of letters"
          class="letter"
          [ngClass]="{
@@ -57,20 +69,41 @@
         Comprobar
       </button>
 
-      <!-- Feedback -->
+      <!-- Feedback: resultado del jugador y de ChatGPT -->
       <div *ngIf="showFeedback"
           class="feedback"
           [class.correct]="isCorrect"
           [class.incorrect]="!isCorrect">
-        <span *ngIf="isCorrect">✔️ ¡Correcto!</span>
-        <span *ngIf="!isCorrect">
-          ❌ La respuesta es:
-          <strong>{{ feedback?.correctAnswer }}</strong>
-        </span>
+
+        <!-- 1) Resultado del jugador -->
+        <div class="player-feedback">
+          <span *ngIf="isCorrect; else playerWrong">
+            ✔️ ¡Correcto!
+          </span>
+          <ng-template #playerWrong>
+            ❌ La respuesta es:
+            <strong>{{ feedback?.correctAnswer }}</strong>
+          </ng-template>
+        </div>
+
+        <!-- 2) Resultado de ChatGPT -->
+        <div class="chatgpt-feedback">
+          <span *ngIf="feedback?.chatgptCorrect; else chatgptWrong">
+            🤖 ChatGPT acertó con:
+            <strong>{{ feedback?.chatgptAnswer }}</strong>
+          </span>
+          <ng-template #chatgptWrong>
+            🤖 ChatGPT falló con:
+            <strong>{{ feedback?.chatgptAnswer }}</strong>
+          </ng-template>
+        </div>
+
+        <!-- 3) Botón Siguiente -->
         <button class="next-button" (click)="nextQuestion()">
           Siguiente pregunta
         </button>
       </div>
+
 
     </ng-container>
 

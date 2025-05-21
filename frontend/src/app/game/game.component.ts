@@ -52,6 +52,10 @@ export class GameComponent implements OnInit, AfterViewInit {
   // idioma
   lang: 'es'|'en' = 'es';
 
+  // propiedades de puntuación
+  playerScore = 0;
+  chatgptScore = 0;
+
   constructor(
     private router: Router,
     private gameService: GameService,
@@ -71,6 +75,7 @@ export class GameComponent implements OnInit, AfterViewInit {
       this.questions = list;
       this.answerStatus = new Array(this.questions.length).fill(null);
       this.currentIndex = 0;
+      this.playerScore = 0;
       this.loadCurrentQuestion();
       this.generateRoscoLetters();
     });
@@ -100,6 +105,12 @@ export class GameComponent implements OnInit, AfterViewInit {
       .subscribe(res => {
         this.feedback = res;
         this.isCorrect = res.correct;
+        if (res.correct) {
+        this.playerScore++;
+      }
+      if (res.chatgptCorrect) {
+        this.chatgptScore++;
+      }
         // guardar estado
         this.answerStatus[this.currentIndex] = res.correct ? 'correct' : 'incorrect';
         this.showFeedback = true;
@@ -119,6 +130,8 @@ export class GameComponent implements OnInit, AfterViewInit {
   /** Al pulsar “Salir” */
   exitGame(): void {
     this.gameService.clear();
+    this.playerScore = 0;
+    this.chatgptScore = 0;
     this.router.navigate(['/']);
   }
 

@@ -177,6 +177,7 @@ html, body {
   border-radius: 4px;
   background: #fff;
   color: #0d1b2a;
+  text-transform: uppercase;
 }
 .answer-input::placeholder {
   color: #666;
@@ -201,6 +202,62 @@ html, body {
 }
 
 /* 10) Feedback texto */
-.feedback {
+.player-feedback,
+.chatgpt-feedback {
+  margin-top: 0.5rem;
   font-size: 1rem;
 }
+
+.chatgpt-feedback {
+  color: #0f0f0f; 
+}
+
+/* ------------------------------------------------ */
+/* Scoreboard dentro del rosco, esquina superior derecha */
+.rosco {
+  position: relative; /* ya lo tienes, pero por si acaso */
+}
+
+.scoreboard {
+  position: absolute;
+  top: 2px;
+  right: -40px;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+/* Cada marcador */
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255,255,255,0.15);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  min-width: 60px;
+}
+
+/* Etiqueta (nombre) */
+.score-item .label {
+  font-size: 0.75rem;
+  color: #eee;
+}
+
+/* Valor del marcador */
+.score-item .value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 0.1rem;
+  color: #fff;
+}
+
+/* Colores por jugador / ChatGPT */
+.score-item.player {
+  background: #2ecc71; /* verde */
+}
+.score-item.chatgpt {
+  background: #0099e5; /* azul */
+}
+
+

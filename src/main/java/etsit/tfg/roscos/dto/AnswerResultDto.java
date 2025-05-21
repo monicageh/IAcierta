@@ -6,15 +6,18 @@ public class AnswerResultDto {
     private final String correctAnswer;
     private final String playerAnswer;
     private final String chatgptAnswer;
+    private final boolean chatgptCorrect;
 
     public AnswerResultDto(boolean correct,
                            String correctAnswer,
                            String playerAnswer,
-                           String chatgptAnswer) {
+                           String chatgptAnswer,
+                           boolean chatgptCorrect) {
         this.correct       = correct;
         this.correctAnswer = correctAnswer;
         this.playerAnswer  = playerAnswer;
         this.chatgptAnswer = chatgptAnswer;
+        this.chatgptCorrect  = chatgptCorrect; 
     }
 
     public boolean isCorrect() {
@@ -33,5 +36,8 @@ public class AnswerResultDto {
         return chatgptAnswer;
     }
     
+    public boolean isChatgptCorrect() { 
+        return chatgptCorrect; 
+    } 
     
 }

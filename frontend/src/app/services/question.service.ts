@@ -14,6 +14,7 @@ export interface AnswerResult {
   correctAnswer: string;
   playerAnswer: string;
   chatgptAnswer: string;
+  chatgptCorrect: boolean;   
 }
 
 @Injectable({

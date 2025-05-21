@@ -37,17 +37,20 @@ public class QuestionService {
     }
 
     /**
-     * Comprueba si la respuesta del jugador coincide con respuestaCorrecta.
+     * Comprueba si la respuesta del jugador y la de chatgpt coincide con respuestaCorrecta.
      */
     public AnswerResultDto checkAnswer(String questionId, String lang, String playerAnswer) {
         Question q = getQuestionById(questionId, lang);
-        boolean ok = q.getRespuestaCorrecta()
-                      .equalsIgnoreCase(playerAnswer.trim());
+        boolean playerOk   = q.getRespuestaCorrecta()
+                              .equalsIgnoreCase(playerAnswer.trim());
+        boolean chatgptOk  = q.getRespuestaCorrecta()
+                              .equalsIgnoreCase(q.getRespuestaChatgpt().trim());
         return new AnswerResultDto(
-            ok,
+            playerOk,
             q.getRespuestaCorrecta(),
             playerAnswer,
-            q.getRespuestaChatgpt()
+            q.getRespuestaChatgpt(),
+            chatgptOk  
         );
     }
 }
