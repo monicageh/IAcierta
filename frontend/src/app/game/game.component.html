@@ -1,19 +1,15 @@
 <!-- src/app/game/game.component.html -->
 
 <div class="game-wrapper">
-
-  <!-- 1) Logo en esquina superior izquierda -->
+  <!-- Logo en esquina superior izquierda -->
   <img src="assets/logoIAcierta.png"
        alt="IAcierta"
        class="logo" />
 
-  <!-- 2) Rosco con posiciones absolutas -->
   <div #roscoRef class="rosco">
-
-    <!-- 2a) Botón Salir -->
+    <!-- Botón Salir -->
     <button class="exit-button" (click)="exitGame()">✖</button>
 
-    <!-- 2b) Marcadores dentro del rosco -->
     <div class="scoreboard">
       <div class="score-item player">
         <span class="label">Jugador</span>
@@ -25,7 +21,7 @@
       </div>
     </div>
 
-    <!-- 2c) Círculos numéricos -->
+    <!-- Círculos del rosco -->
     <div *ngFor="let l of letters"
          class="letter"
          [ngClass]="{
@@ -41,90 +37,118 @@
       {{ l.value }}
     </div>
 
-    <!-- 3) Panel central -->
+    <!-- Panel central -->
     <div class="inner-panel"
-        [ngClass]="{
-          'panel-correct': showFeedback && isCorrect,
-          'panel-incorrect': showFeedback && !isCorrect
-        }">
+         [ngClass]="{
+           'panel-correct': showFeedback && isCorrect && !showResultsView,
+           'panel-incorrect': showFeedback && !isCorrect && !showResultsView,
+           'panel-results': showResultsView
+         }">
 
-      <!-- 1) Estado inicial: pregunta + input + comprobar -->
-      <ng-container *ngIf="!showFeedback">
-        <!-- Indicador de “Empieza por la X:” en **todas** las preguntas -->
-        <div class="start-line">
-          <span class="start-phrase">Empieza por la</span>
-          <span class="start-letter">
-            {{ question.respuestaCorrecta.charAt(0) }}
-          </span>
-          <span class="start-phrase">:</span>
-        </div>
+      <!-- 1) Pregunta / Feedback individual -->
+      <ng-container *ngIf="!showResultsView">
 
-        <div class="question-text">{{ questionBody }}</div>
+        <!-- 1A) Pantalla de pregunta -->
+        <ng-container *ngIf="!showFeedback">
+          <div class="start-line">
+            <span class="start-phrase">Empieza por la</span>
+            <span class="start-letter">
+              {{ question?.respuestaCorrecta.charAt(0) }}
+            </span>
+            <span class="start-phrase">:</span>
+          </div>
 
-        <input class="answer-input"
-              type="text"
-              [(ngModel)]="userAnswer"
-              (ngModelChange)="userAnswer = userAnswer.toUpperCase()"
-              placeholder="Tu respuesta…" />
+          <div class="question-text">
+            {{ questionBody }}
+          </div>
 
-        <button class="check-button"
-                (click)="checkAnswer()">
-          Comprobar
-        </button>
+          <input class="answer-input"
+                 type="text"
+                 [(ngModel)]="userAnswer"
+                 (ngModelChange)="userAnswer = userAnswer.toUpperCase()"
+                 placeholder="Tu respuesta…" />
+
+          <button class="check-button"
+                  (click)="checkAnswer()">
+            Comprobar
+          </button>
+        </ng-container>
+
+        <!-- 1B) Feedback tras comprobar -->
+        <ng-container *ngIf="showFeedback">
+          <!-- Resultado del jugador -->
+          <div class="answer-box player-box">
+            {{ feedback?.playerAnswer }}
+          </div>
+
+          <div *ngIf="isCorrect; else wrongTpl" class="congrats">¡ENHORABUENA!</div>
+      
+          <ng-template #wrongTpl>
+            <div class="result-line">La respuesta correcta era:</div>
+            <div class="correct-answer-large">
+              {{ feedback?.correctAnswer }}
+            </div>
+            <div class="try-again">¡INTÉNTALO DE NUEVO!</div>
+          </ng-template>
+
+          <!-- Resultado de ChatGPT -->
+          <div class="chatgpt-label">
+            🤖 ChatGPT ha respondido:
+          </div>
+          <div *ngIf="feedback?.chatgptAnswer !== 'PASAPALABRA'; else emptyTpl"
+               class="answer-box chatgpt-box"
+               [ngClass]="{
+                 'chatgpt-correct': feedback?.chatgptCorrect,
+                 'chatgpt-incorrect': !feedback?.chatgptCorrect
+               }">
+            {{ feedback?.chatgptAnswer }}
+          </div>
+          <ng-template #emptyTpl>
+            <div class="answer-box chatgpt-box"></div>
+          </ng-template>
+
+          <!-- Botón Siguiente / Resultados -->
+          <div>
+            <button
+              *ngIf="currentIndex < questions.length - 1"
+              class="next-button"
+              (click)="nextQuestion()">
+              Siguiente pregunta
+            </button>
+            <button
+              *ngIf="currentIndex === questions.length - 1"
+              class="next-button"
+              (click)="nextQuestion()">
+              Resultados
+            </button>
+          </div>
+        </ng-container>
+
       </ng-container>
 
-      <!-- 2) Feedback tras comprobar -->
-      <div *ngIf="showFeedback" class="feedback"
-          [class.correct]="isCorrect"
-          [class.incorrect]="!isCorrect">
-
-        <!-- Resultado del jugador -->
-        <div *ngIf="isCorrect; else wrongTpl">
-          <div class="result-line">
-            <span class="answer-box player-box">
-              {{ feedback?.playerAnswer }}
-            </span>
+      <!-- 2) Pantalla de resultados finales -->
+      <ng-container *ngIf="showResultsView">
+        <div class="results-box">
+          <h2>Resultados</h2>
+          <div class="score-summary">
+            <span class="scoreJugador">Jugador: {{ playerScore }}</span>
+            <span class="scoreChatgpt">ChatGPT: {{ chatgptScore }}</span>
           </div>
-          <div class="congrats">¡ENHORABUENA!</div>
-        </div>
-
-        <ng-template #wrongTpl>
-          <div class="result-line">
-            <span class="answer-box player-box">
-              {{ feedback?.playerAnswer }}
-            </span>
+          <div class="winner" *ngIf="playerScore > chatgptScore">
+            ¡HAS GANADO! 🎉
           </div>
-          <div class="result-line">
-            La respuesta correcta era:
+          <div class="winner" *ngIf="playerScore < chatgptScore">
+            ¡CHATGPT GANA! 🤖
           </div>
-          <div class="answer">
-            {{ feedback?.correctAnswer }}
+          <div class="winner" *ngIf="playerScore === chatgptScore">
+            EMPATE 🤝
           </div>
-          <div class="try-again">¡INTÉNTALO DE NUEVO!</div>
-        </ng-template>
-
-        <!-- Resultado de ChatGPT -->
-        <div class="chatgpt-label">
-          🤖 ChatGPT ha respondido:
-        </div>
-        <div *ngIf="feedback?.chatgptAnswer !== 'PASAPALABRA'; else emptyTpl"
-            class="answer-box chatgpt-box"
-            [ngClass]="{
-              'chatgpt-correct': feedback?.chatgptCorrect,
-              'chatgpt-incorrect': !feedback?.chatgptCorrect
-            }">
-          {{ feedback?.chatgptAnswer }}
-        </div>
-        <ng-template #emptyTpl>
-          <div class="answer-box chatgpt-box"></div>
-        </ng-template>
-
-        <!-- Botón Siguiente -->
-        <div>
-          <button class="next-button" (click)="nextQuestion()">
-            Siguiente pregunta
+          <button class="rematch-button" (click)="rematch()">
+            Revancha
           </button>
         </div>
-      </div>
+      </ng-container>
+
+    </div>
   </div>
 </div>

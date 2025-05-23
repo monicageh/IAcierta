@@ -56,6 +56,9 @@ export class GameComponent implements OnInit, AfterViewInit {
   playerScore = 0;
   chatgptScore = 0;
 
+  // indicador de pantalla de resultados
+  showResultsView = false;
+
   constructor(
     private router: Router,
     private gameService: GameService,
@@ -70,15 +73,9 @@ export class GameComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // 2) Cargar 25 preguntas aleatorias
-    this.questionService.startGame(this.lang).subscribe(list => {
-      this.questions = list;
-      this.answerStatus = new Array(this.questions.length).fill(null);
-      this.currentIndex = 0;
-      this.playerScore = 0;
-      this.loadCurrentQuestion();
-      this.generateRoscoLetters();
-    });
+    // cargar preguntas y resetear estado 
+    this.questionService.startGame(this.lang)
+      .subscribe(list => this.resetGameState(list));
   }
 
   ngAfterViewInit(): void {
@@ -95,6 +92,19 @@ export class GameComponent implements OnInit, AfterViewInit {
     this.question = this.questions[this.currentIndex];
     this.userAnswer = '';
     this.showFeedback = false;
+  }
+
+  private resetGameState(list: Question[]) {
+    this.questions       = list;
+    this.answerStatus    = new Array(list.length).fill(null);
+    this.currentIndex    = 0;
+    this.playerScore     = 0;
+    this.chatgptScore    = 0;
+    this.showFeedback    = false;
+    this.showResultsView = false;
+    this.userAnswer      = '';
+    this.loadCurrentQuestion();
+    this.generateRoscoLetters();
   }
 
   /** Al pulsar “Comprobar” */
@@ -117,14 +127,20 @@ export class GameComponent implements OnInit, AfterViewInit {
       });
   }
 
-  /** Al pulsar “Siguiente pregunta” */
+  /** Al pulsar “Siguiente pregunta”: Avanza a la siguiente o muestra resultados si era la última */
   nextQuestion(): void {
-    this.currentIndex++;
-    if (this.currentIndex < this.questions.length) {
-      this.loadCurrentQuestion();
-    } else {
-      this.exitGame();
+    if (this.currentIndex === this.questions.length - 1) {
+      this.showResultsView = true;
+      return;
     }
+    this.currentIndex++;
+    this.loadCurrentQuestion();
+  }
+
+  /** Inicia otra partida (Revancha) */
+   rematch(): void {
+    this.questionService.startGame(this.lang)
+      .subscribe(list => this.resetGameState(list));
   }
 
   /** Al pulsar “Salir” */
