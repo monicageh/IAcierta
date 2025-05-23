@@ -1,10 +1,19 @@
-<div class="home-container">
+<!-- src/app/home/home.component.html -->
+<div class="home-wrapper">
+  <!-- Logo grande -->
+  <img src="assets/logoIAcierta.png"
+       alt="IAcierta Logo"
+       class="home-logo" />
+
+  <!-- Título principal -->
   <h1>Selecciona el idioma</h1>
-  <div class="buttons">
-    <button (click)="selectLanguage('es')">
+
+  <!-- Botones de idioma -->
+  <div class="lang-buttons">
+    <button class="lang-btn es" (click)="selectLang('es')">
       <img src="assets/spain.png" alt="Español" />
     </button>
-    <button (click)="selectLanguage('en')">
+    <button class="lang-btn en" (click)="selectLang('en')">
       <img src="assets/uk.png" alt="English" />
     </button>
   </div>
