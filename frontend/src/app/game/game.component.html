@@ -42,75 +42,89 @@
     </div>
 
     <!-- 3) Panel central -->
-  <div class="inner-panel">
-    <ng-container *ngIf="question; else loading">
+    <div class="inner-panel"
+        [ngClass]="{
+          'panel-correct': showFeedback && isCorrect,
+          'panel-incorrect': showFeedback && !isCorrect
+        }">
 
-      <!-- Indicador “Empieza por la X:” -->
-      <div class="start-line">
-        <span class="start-phrase">Empieza por la</span>
-        <span class="start-letter">{{ question.respuestaCorrecta.charAt(0) }}</span>
-        <span class="start-phrase">:</span>
-      </div>
+      <!-- 1) Estado inicial: pregunta + input + comprobar -->
+      <ng-container *ngIf="!showFeedback">
+        <!-- Indicador de “Empieza por la X:” en **todas** las preguntas -->
+        <div class="start-line">
+          <span class="start-phrase">Empieza por la</span>
+          <span class="start-letter">
+            {{ question.respuestaCorrecta.charAt(0) }}
+          </span>
+          <span class="start-phrase">:</span>
+        </div>
 
-      <!-- Nuevo recuadro para el cuerpo de la pregunta -->
-      <div class="question-body-box">
-        {{ questionBody }}
-      </div>
+        <div class="question-text">{{ questionBody }}</div>
 
-      <!-- Input y botón -->
-      <input class="answer-input"
-            type="text"
-            [(ngModel)]="userAnswer"
-            placeholder="Tu respuesta…" />
+        <input class="answer-input"
+              type="text"
+              [(ngModel)]="userAnswer"
+              (ngModelChange)="userAnswer = userAnswer.toUpperCase()"
+              placeholder="Tu respuesta…" />
 
-      <button class="check-button"
-              *ngIf="!showFeedback"
-              (click)="checkAnswer()">
-        Comprobar
-      </button>
+        <button class="check-button"
+                (click)="checkAnswer()">
+          Comprobar
+        </button>
+      </ng-container>
 
-      <!-- Feedback: resultado del jugador y de ChatGPT -->
-      <div *ngIf="showFeedback"
-          class="feedback"
+      <!-- 2) Feedback tras comprobar -->
+      <div *ngIf="showFeedback" class="feedback"
           [class.correct]="isCorrect"
           [class.incorrect]="!isCorrect">
 
-        <!-- 1) Resultado del jugador -->
-        <div class="player-feedback">
-          <span *ngIf="isCorrect; else playerWrong">
-            ✔️ ¡Correcto!
-          </span>
-          <ng-template #playerWrong>
-            ❌ La respuesta es:
-            <strong>{{ feedback?.correctAnswer }}</strong>
-          </ng-template>
+        <!-- Resultado del jugador -->
+        <div *ngIf="isCorrect; else wrongTpl">
+          <div class="result-line">
+            <span class="answer-box player-box">
+              {{ feedback?.playerAnswer }}
+            </span>
+          </div>
+          <div class="congrats">¡ENHORABUENA!</div>
         </div>
 
-        <!-- 2) Resultado de ChatGPT -->
-        <div class="chatgpt-feedback">
-          <span *ngIf="feedback?.chatgptCorrect; else chatgptWrong">
-            🤖 ChatGPT acertó con:
-            <strong>{{ feedback?.chatgptAnswer }}</strong>
-          </span>
-          <ng-template #chatgptWrong>
-            🤖 ChatGPT falló con:
-            <strong>{{ feedback?.chatgptAnswer }}</strong>
-          </ng-template>
-        </div>
+        <ng-template #wrongTpl>
+          <div class="result-line">
+            <span class="answer-box player-box">
+              {{ feedback?.playerAnswer }}
+            </span>
+          </div>
+          <div class="result-line">
+            La respuesta correcta era:
+          </div>
+          <div class="answer">
+            {{ feedback?.correctAnswer }}
+          </div>
+          <div class="try-again">¡INTÉNTALO DE NUEVO!</div>
+        </ng-template>
 
-        <!-- 3) Botón Siguiente -->
-        <button class="next-button" (click)="nextQuestion()">
-          Siguiente pregunta
-        </button>
+        <!-- Resultado de ChatGPT -->
+        <div class="chatgpt-label">
+          🤖 ChatGPT ha respondido:
+        </div>
+        <div *ngIf="feedback?.chatgptAnswer !== 'PASAPALABRA'; else emptyTpl"
+            class="answer-box chatgpt-box"
+            [ngClass]="{
+              'chatgpt-correct': feedback?.chatgptCorrect,
+              'chatgpt-incorrect': !feedback?.chatgptCorrect
+            }">
+          {{ feedback?.chatgptAnswer }}
+        </div>
+        <ng-template #emptyTpl>
+          <div class="answer-box chatgpt-box"></div>
+        </ng-template>
+
+        <!-- Botón Siguiente -->
+        <div>
+          <button class="next-button" (click)="nextQuestion()">
+            Siguiente pregunta
+          </button>
+        </div>
       </div>
-
-
-    </ng-container>
-
-    <ng-template #loading>
-      <p>Cargando preguntas…</p>
-    </ng-template>
-  </div>
-
   </div>
 </div>
